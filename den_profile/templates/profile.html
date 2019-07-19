@@ -1,0 +1,74 @@
+
+{% extends 'templates/base.html' %}
+
+
+{% block main %}
+<div class="row">
+  <!-- Feed -->
+  <div class="col-9">
+    <h3>@{{ user.username }}</h3>
+ <hr> # Add this line
+
+    <b><a href="/{{ user.username }}/follows/">Follows:</a></b> {{ user.den_profile.follows.count }} -  # Add this line<
+    <b><a href="/{{ user.username }}/followers/">Followers:</a></b> {{ user.den_profile.followed_by.count }}  # Add this line
+
+    {% ifnotequal request.user user %}# Add this line
+      <hr> # Add this line
+
+      {% if request.user.den_profile in user.den_profile.followed_by.all %} # Add this line
+        <a href="/{{ user.username }}/stopfollow/" class="btn btn-danger">Stop follow</a> # Add this line
+      {% else %} # Add this line
+        <a href="/{{ user.username }}/follow/" class="btn btn-success">Follow</a> # Add this line
+      {% endif %} # Add this line
+    {% endifnotequal %}# Add this line
+
+    <hr> # Add this line
+{% if form.errors %}
+	{% for field in form %}
+		{% for error in form.errors %}
+			<div class="alert alert-danger">
+				<b>{{ error|escape }}</b>
+			</div>
+		{% endfor %}
+	{% endfor %}
+	{% for error in form.non_field_errors %}
+		<div class="alert alert-danger">
+			<b>{{ error|escape }}</b>
+		</div>
+	{% endfor %}
+{% endif %}
+
+<form action="/{{ request.user.username }}/" method="post">
+	{% csrf_token %}
+
+	{% for field in form %}
+		<div class="form-group">
+			{{ field }}
+		</div>
+	{% endfor %}
+
+	<input type="hidden" value="{{ request.path }}" name="redirect">
+	<input type="submit" value="Post den" class="btn btn-primary">
+</form>
+    {% if user.dens.all %}
+      {% for den in user.dens.all %}
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-body">
+            <h5 class="card-title">@{{ den.user.username }}</h5>
+            <p class="card-text"><b>{{ den.created_at }}</b> - {{ den.body }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No dens yet!</p>
+    {% endif %}
+  </div>
+
+  <!-- Sidebar -->
+  <div class="col-3">
+    <h3>Add den</h3>
+  </div>
+</div>
+{% endblock %}
+
+I
